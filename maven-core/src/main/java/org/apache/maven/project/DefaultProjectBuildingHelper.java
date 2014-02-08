@@ -194,7 +194,7 @@ public class DefaultProjectBuildingHelper
         for ( Plugin plugin : extensionPlugins )
         {
             ExtensionRealmCache.CacheRecord recordRealm =
-                pluginManager.setupExtensionsRealm( project, plugin, request.getRepositorySession() );
+                pluginManager.setupExtensionsRealm( project, plugin, request.getRepositorySession(), request.getSessionRealm() );
 
             final ClassRealm extensionRealm = recordRealm.realm;
             final ExtensionDescriptor extensionDescriptor = recordRealm.desciptor;
@@ -230,7 +230,7 @@ public class DefaultProjectBuildingHelper
 
         if ( record == null )
         {
-            projectRealm = classRealmManager.createProjectRealm( model, toAetherArtifacts( publicArtifacts ) );
+            projectRealm = classRealmManager.createProjectRealm( model, toAetherArtifacts( publicArtifacts ), request.getSessionRealm() );
 
             Set<String> exclusions = new LinkedHashSet<String>();
 
@@ -275,13 +275,18 @@ public class DefaultProjectBuildingHelper
         return record;
     }
 
-    public void selectProjectRealm( MavenProject project )
+    public void selectProjectRealm( MavenProject project, ClassLoader sessionRealm )
     {
         ClassLoader projectRealm = project.getClassRealm();
 
         if ( projectRealm == null )
         {
-            projectRealm = classRealmManager.getCoreRealm();
+            projectRealm = sessionRealm;
+
+            if ( projectRealm == null )
+            {
+                projectRealm = classRealmManager.getCoreRealm();
+            }
         }
 
         Thread.currentThread().setContextClassLoader( projectRealm );

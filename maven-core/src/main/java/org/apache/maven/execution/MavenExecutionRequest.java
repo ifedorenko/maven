@@ -366,6 +366,9 @@ public interface MavenExecutionRequest
      */
     MavenExecutionRequest setGlobalToolchainsFile( File globalToolchainsFile );
 
+    File getExtensionDirectory();
+    MavenExecutionRequest setExtensionDirectory( File extensionDirectory );
+
     ExecutionListener getExecutionListener();
 
     MavenExecutionRequest setExecutionListener( ExecutionListener executionListener );

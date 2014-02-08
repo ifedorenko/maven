@@ -20,7 +20,10 @@ package org.apache.maven.settings.building;
  */
 
 import java.io.File;
+import java.util.List;
 import java.util.Properties;
+
+import org.apache.maven.building.Source;
 
 /**
  * Collects settings that control the building of effective settings.
@@ -128,4 +131,20 @@ public interface SettingsBuildingRequest
      */
     SettingsBuildingRequest setUserProperties( Properties userProperties );
 
+    /**
+     * Adds the custom settings source to the request. Multiple custom settings sources are supported. Custom settings,
+     * if present, take precedence over user and global settings. If multiple custom settings are present, the first
+     * added takes precedence.
+     * 
+     * @param customSettingsSource The user settings source, may be {@code null}, which is tolerated but ignored.
+     * @return This request, never {@code null}.
+     */
+    SettingsBuildingRequest addCustomSettingsSource( Source customSettingsSource );
+
+    /**
+     * Gets the custom settings sources.
+     * 
+     * @return The custom settings sources or empty list if none.
+     */
+    List<Source> getCustomSettingsSources();
 }

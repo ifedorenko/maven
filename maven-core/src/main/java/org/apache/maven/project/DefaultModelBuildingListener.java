@@ -133,7 +133,7 @@ class DefaultModelBuildingListener
                         .setException( e ) );
             }
 
-            projectBuildingHelper.selectProjectRealm( project );
+            projectBuildingHelper.selectProjectRealm( project, projectBuildingRequest.getSessionRealm() );
         }
 
         // build the regular repos after extensions are loaded to allow for custom layouts

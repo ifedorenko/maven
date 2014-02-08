@@ -150,6 +150,9 @@ public interface ProjectBuildingRequest
 
     ProjectBuildingRequest setRepositorySession( RepositorySystemSession repositorySession );
 
+    ClassLoader getSessionRealm();
+    ProjectBuildingRequest setSessionRealm( ClassLoader sessionRealm );
+
     /**
      * Sets the merge mode used to combine repositories declared in the POM with the repositories specified in this
      * request.

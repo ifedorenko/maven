@@ -23,6 +23,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -89,28 +90,39 @@ public class DefaultSettingsBuilder
     {
         DefaultSettingsProblemCollector problems = new DefaultSettingsProblemCollector( null );
 
-        Source globalSettingsSource =
-            getSettingsSource( request.getGlobalSettingsFile(), request.getGlobalSettingsSource() );
-        Settings globalSettings = readSettings( globalSettingsSource, request, problems );
+        ArrayList<Source> sources = new ArrayList<Source>();
 
-        Source userSettingsSource =
-            getSettingsSource( request.getUserSettingsFile(), request.getUserSettingsSource() );
-        Settings userSettings = readSettings( userSettingsSource, request, problems );
+        sources.addAll( request.getCustomSettingsSources() );
+        sources.add( getSettingsSource( request.getUserSettingsFile(), request.getUserSettingsSource() ) );
+        sources.add( getSettingsSource( request.getGlobalSettingsFile(), request.getGlobalSettingsSource() ) );
 
-        settingsMerger.merge( userSettings, globalSettings, TrackableBase.GLOBAL_LEVEL );
+        Settings settings = null;
+        
+        for ( Source source : sources )
+        {
+            Settings readSettings = readSettings( source, request, problems );
+            if ( settings == null )
+            {
+                settings = readSettings;
+            }
+            else
+            {
+                settingsMerger.merge( settings, readSettings, TrackableBase.GLOBAL_LEVEL );
+            }
+        }
 
         problems.setSource( "" );
 
-        userSettings = interpolate( userSettings, request, problems );
+        settings = interpolate( settings, request, problems );
 
         // for the special case of a drive-relative Windows path, make sure it's absolute to save plugins from trouble
-        String localRepository = userSettings.getLocalRepository();
+        String localRepository = settings.getLocalRepository();
         if ( localRepository != null && localRepository.length() > 0 )
         {
             File file = new File( localRepository );
             if ( !file.isAbsolute() && file.getPath().startsWith( File.separator ) )
             {
-                userSettings.setLocalRepository( file.getAbsolutePath() );
+                settings.setLocalRepository( file.getAbsolutePath() );
             }
         }
 
@@ -119,7 +131,7 @@ public class DefaultSettingsBuilder
             throw new SettingsBuildingException( problems.getProblems() );
         }
 
-        return new DefaultSettingsBuildingResult( userSettings, problems.getProblems() );
+        return new DefaultSettingsBuildingResult( settings, problems.getProblems() );
     }
 
     private boolean hasErrors( List<SettingsProblem> problems )

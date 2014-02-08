@@ -98,7 +98,7 @@ public interface MavenPluginManager
      * @since 3.2.6
      */
     ExtensionRealmCache.CacheRecord setupExtensionsRealm( MavenProject project, Plugin plugin,
-                                                          RepositorySystemSession session )
+                                                          RepositorySystemSession session, ClassLoader sessionRealm )
         throws PluginManagerException;
 
     /**

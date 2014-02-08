@@ -336,7 +336,7 @@ public class DefaultMavenPluginManager
 
         MavenProject project = session.getCurrentProject();
 
-        Map<String, ClassLoader> foreignImports = calcImports( project, parent, imports );
+        Map<String, ClassLoader> foreignImports = calcImports( session, project, parent, imports );
 
         PluginRealmCache.Key cacheKey =
             pluginRealmCache.createKey( plugin, parent, foreignImports, filter, project.getRemotePluginRepositories(),
@@ -393,7 +393,7 @@ public class DefaultMavenPluginManager
             ExtensionRealmCache.CacheRecord extensionRecord;
             try
             {
-                extensionRecord = setupExtensionsRealm( project, plugin, repositorySession );
+                extensionRecord = setupExtensionsRealm( project, plugin, repositorySession, session.getClassRealm() );
             }
             catch ( PluginManagerException e )
             {
@@ -487,19 +487,24 @@ public class DefaultMavenPluginManager
         return artifacts;
     }
 
-    private Map<String, ClassLoader> calcImports( MavenProject project, ClassLoader parent, List<String> imports )
+    private Map<String, ClassLoader> calcImports( MavenSession session, MavenProject project, ClassLoader parent,
+                                                  List<String> imports )
     {
         Map<String, ClassLoader> foreignImports = new HashMap<String, ClassLoader>();
 
-        ClassLoader projectRealm = project.getClassRealm();
-        if ( projectRealm != null )
+        ClassLoader apiRealm = project.getClassRealm();
+
+        if ( apiRealm == null )
         {
-            foreignImports.put( "", projectRealm );
+            apiRealm = session.getClassRealm();
         }
-        else
+
+        if ( apiRealm == null )
         {
-            foreignImports.put( "", classRealmManager.getMavenApiRealm() );
+            apiRealm = classRealmManager.getMavenApiRealm();
         }
+
+        foreignImports.put( "", apiRealm );
 
         if ( parent != null && imports != null )
         {
@@ -804,8 +809,10 @@ public class DefaultMavenPluginManager
         }
     }
 
+    @Override
     public ExtensionRealmCache.CacheRecord setupExtensionsRealm( MavenProject project, Plugin plugin,
-                                                                 RepositorySystemSession session )
+                                                                 RepositorySystemSession session,
+                                                                 ClassLoader sessionRealm )
         throws PluginManagerException
     {
         @SuppressWarnings( "unchecked" )
@@ -874,11 +881,12 @@ public class DefaultMavenPluginManager
         pluginArtifactsCache.register( project, cacheKey, recordArtifacts );
 
         // create and cache extensions realms
-        final ExtensionRealmCache.Key extensionKey = extensionRealmCache.createKey( artifacts );
+        final ExtensionRealmCache.Key extensionKey = extensionRealmCache.createKey( artifacts, sessionRealm );
         extensionRecord = extensionRealmCache.get( extensionKey );
         if ( extensionRecord == null )
         {
-            ClassRealm extensionRealm = classRealmManager.createExtensionRealm( plugin, toAetherArtifacts( artifacts ) );
+            ClassRealm extensionRealm =
+                classRealmManager.createExtensionRealm( plugin, toAetherArtifacts( artifacts ), sessionRealm );
 
             // TODO figure out how to use the same PluginDescriptor when running mojos
 

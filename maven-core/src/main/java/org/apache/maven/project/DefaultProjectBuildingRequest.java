@@ -65,6 +65,8 @@ public class DefaultProjectBuildingRequest
 
     private RepositoryMerging repositoryMerging = RepositoryMerging.POM_DOMINANT;
 
+    private ClassLoader sessionRealm;
+
     public DefaultProjectBuildingRequest()
     {
         processPlugins = true;
@@ -94,6 +96,7 @@ public class DefaultProjectBuildingRequest
         setProject( request.getProject() );
         setResolveDependencies( request.isResolveDependencies() );
         setValidationLevel( request.getValidationLevel() );
+        setSessionRealm( request.getSessionRealm() );
     }
 
     public MavenProject getProject()
@@ -334,6 +337,17 @@ public class DefaultProjectBuildingRequest
     public RepositoryMerging getRepositoryMerging()
     {
         return repositoryMerging;
+    }
+
+    public ClassLoader getSessionRealm()
+    {
+        return sessionRealm;
+    }
+
+    public ProjectBuildingRequest setSessionRealm( ClassLoader sessionRealm )
+    {
+        this.sessionRealm = sessionRealm;
+        return this;
     }
 
 }

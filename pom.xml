@@ -460,6 +460,7 @@
               <exclude>src/test/projects/**</exclude>
               <exclude>src/test/remote-repo/**</exclude>
               <exclude>**/*.odg</exclude>
+              <exclude>feature-session-extensions.md</exclude>
             </excludes>
           </configuration>
         </plugin>

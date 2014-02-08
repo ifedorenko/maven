@@ -89,6 +89,8 @@ public class DefaultMavenExecutionRequest
 
     private File globalToolchainsFile;
 
+    private File extensionDirectory;
+
     // ----------------------------------------------------------------------------
     // Request
     // ----------------------------------------------------------------------------
@@ -198,6 +200,7 @@ public class DefaultMavenExecutionRequest
         copy.setExecutionListener( original.getExecutionListener() );
         copy.setUseLegacyLocalRepository( original.isUseLegacyLocalRepository() );
         copy.setBuilderId( original.getBuilderId() );
+        copy.setExtensionDirectory( original.getExtensionDirectory() );
         return copy;
     }
 
@@ -952,6 +955,18 @@ public class DefaultMavenExecutionRequest
     public MavenExecutionRequest setGlobalToolchainsFile( File globalToolchainsFile )
     {
         this.globalToolchainsFile = globalToolchainsFile;
+        return this;
+    }
+
+    public File getExtensionDirectory()
+    {
+        return extensionDirectory;
+    }
+
+    public MavenExecutionRequest setExtensionDirectory( File extensionDirectory )
+    {
+        this.extensionDirectory = extensionDirectory;
+
         return this;
     }
 

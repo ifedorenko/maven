@@ -315,14 +315,36 @@ public class DefaultClassRealmManager
         return container.getContainerRealm();
     }
 
-    public ClassRealm createProjectRealm( Model model, List<Artifact> artifacts )
+    public ClassRealm createSessionRealm()
+    {
+        ClassLoader parent = getMavenApiRealm();
+
+        return createRealm( "maven.session", RealmType.Session, parent, null, null, null );
+    }
+
+    public ClassRealm createSessionExtensionRealm( Plugin plugin, List<Artifact> artifacts )
+    {
+        if ( plugin == null )
+        {
+            throw new IllegalArgumentException( "extension plugin missing" );
+        }
+
+        ClassLoader parent = ClassLoader.getSystemClassLoader();
+
+        Map<String, ClassLoader> foreignImports =
+            Collections.<String, ClassLoader>singletonMap( "", getMavenApiRealm() );
+
+        return createRealm( getKey( plugin, true ), RealmType.SessionExtension, parent, null, foreignImports, artifacts );
+    }
+
+    public ClassRealm createProjectRealm( Model model, List<Artifact> artifacts, ClassLoader sessionRealm )
     {
         if ( model == null )
         {
             throw new IllegalArgumentException( "model missing" );
         }
 
-        ClassLoader parent = getMavenApiRealm();
+        ClassLoader parent = getProjectApiRealm( sessionRealm );
 
         return createRealm( getKey( model ), RealmType.Project, parent, null, null, artifacts );
     }
@@ -332,7 +354,12 @@ public class DefaultClassRealmManager
         return "project>" + model.getGroupId() + ":" + model.getArtifactId() + ":" + model.getVersion();
     }
 
-    public ClassRealm createExtensionRealm( Plugin plugin, List<Artifact> artifacts )
+    private ClassLoader getProjectApiRealm( ClassLoader sessionRealm )
+    {
+        return ( sessionRealm != null ) ? sessionRealm : getMavenApiRealm();
+    }
+
+    public ClassRealm createExtensionRealm( Plugin plugin, List<Artifact> artifacts, ClassLoader sessionRealm )
     {
         if ( plugin == null )
         {
@@ -342,7 +369,7 @@ public class DefaultClassRealmManager
         ClassLoader parent = PARENT_CLASSLOADER;
 
         Map<String, ClassLoader> foreignImports =
-            Collections.<String, ClassLoader>singletonMap( "", getMavenApiRealm() );
+            Collections.<String, ClassLoader>singletonMap( "", getProjectApiRealm( sessionRealm ) );
 
         return createRealm( getKey( plugin, true ), RealmType.Extension, parent, null, foreignImports, artifacts );
     }

@@ -44,7 +44,7 @@ public interface ExtensionRealmCache
         // marker interface for cache keys
     }
 
-    static class CacheRecord
+    public static class CacheRecord
     {
 
         public final ClassRealm realm;
@@ -62,7 +62,7 @@ public interface ExtensionRealmCache
 
     }
 
-    Key createKey( List<Artifact> extensionArtifacts );
+    Key createKey( List<Artifact> extensionArtifacts, ClassLoader sessionRealm );
 
     CacheRecord get( Key key );
 

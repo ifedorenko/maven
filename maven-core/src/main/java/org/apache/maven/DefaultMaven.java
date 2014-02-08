@@ -46,6 +46,7 @@ import org.apache.maven.execution.MavenExecutionRequestPopulator;
 import org.apache.maven.execution.MavenExecutionResult;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.execution.ProjectDependencyGraph;
+import org.apache.maven.extension.internal.SessionExtensionLoader;
 import org.apache.maven.lifecycle.internal.ExecutionEventCatapult;
 import org.apache.maven.lifecycle.internal.LifecycleStarter;
 import org.apache.maven.model.Plugin;
@@ -142,6 +143,9 @@ public class DefaultMaven
 
     @Requirement
     private EventSpyDispatcher eventSpyDispatcher;
+    
+    @Requirement
+    private SessionExtensionLoader sessionExtensionLoader;
 
     @Requirement
     private SessionScope sessionScope;
@@ -222,6 +226,16 @@ public class DefaultMaven
 
         DefaultRepositorySystemSession repoSession = (DefaultRepositorySystemSession) newRepositorySession( request );
 
+        ClassLoader sessionRealm;
+        try
+        {
+            sessionRealm = sessionExtensionLoader.loadExtensions( request, repoSession );
+        }
+        catch ( Exception e )
+        {
+            return addExceptionToResult( result, e );
+        }
+        
         MavenSession session = new MavenSession( container, repoSession, request, result );
 
         //
@@ -232,6 +246,26 @@ public class DefaultMaven
         sessionScope.seed( MavenSession.class, session );
 
         legacySupport.setSession( session );
+        session.setClassRealm( sessionRealm );
+
+        ClassLoader tccl = Thread.currentThread().getContextClassLoader();
+        try
+        {
+            Thread.currentThread().setContextClassLoader( ( sessionRealm != null ) ? sessionRealm
+                                                                          : container.getContainerRealm() );
+
+            return doExecute( request, result, session );
+        }
+        finally
+        {
+            Thread.currentThread().setContextClassLoader( tccl );
+        }
+    }
+
+    private MavenExecutionResult doExecute( MavenExecutionRequest request, MavenExecutionResult result,
+                                            MavenSession session )
+    {
+        DefaultRepositorySystemSession repoSession = (DefaultRepositorySystemSession) session.getRepositorySession();
 
         try
         {
@@ -641,8 +675,10 @@ public class DefaultMaven
         throws ProjectBuildingException
     {
         MavenExecutionRequest request = session.getRequest();
-
-        request.getProjectBuildingRequest().setRepositorySession( session.getRepositorySession() );
+        
+        ProjectBuildingRequest projectBuildingRequest = request.getProjectBuildingRequest();
+        projectBuildingRequest.setRepositorySession( session.getRepositorySession() );
+        projectBuildingRequest.setSessionRealm( session.getClassRealm() );
 
         List<MavenProject> projects = new ArrayList<MavenProject>();
 
@@ -651,8 +687,7 @@ public class DefaultMaven
         if ( request.getPom() == null )
         {
             ModelSource modelSource = new UrlModelSource( DefaultMaven.class.getResource( "project/standalone.xml" ) );
-            MavenProject project =
-                projectBuilder.build( modelSource, request.getProjectBuildingRequest() ).getProject();
+            MavenProject project = projectBuilder.build( modelSource, projectBuildingRequest ).getProject();
             project.setExecutionRoot( true );
             projects.add( project );
             request.setProjectPresent( false );
@@ -660,17 +695,15 @@ public class DefaultMaven
         }
 
         List<File> files = Arrays.asList( request.getPom().getAbsoluteFile() );
-        collectProjects( projects, files, request );
+        collectProjects( projects, files, projectBuildingRequest, request.isRecursive() );
         return projects;
     }
 
-    private void collectProjects( List<MavenProject> projects, List<File> files, MavenExecutionRequest request )
+    private void collectProjects( List<MavenProject> projects, List<File> files,
+                                  ProjectBuildingRequest projectBuildingRequest, boolean recursive )
         throws ProjectBuildingException
     {
-        ProjectBuildingRequest projectBuildingRequest = request.getProjectBuildingRequest();
-
-        List<ProjectBuildingResult> results =
-            projectBuilder.build( files, request.isRecursive(), projectBuildingRequest );
+        List<ProjectBuildingResult> results = projectBuilder.build( files, recursive, projectBuildingRequest );
 
         boolean problems = false;
 
