@@ -63,6 +63,10 @@ public class LifecyclePluginResolver
 
         for ( Plugin plugin : project.getBuildPlugins() )
         {
+            if ( isAlias( plugin ) )
+            {
+                continue;
+            }
             if ( plugin.getVersion() == null )
             {
                 PluginVersionRequest request =
@@ -70,7 +74,7 @@ public class LifecyclePluginResolver
                                                      project.getRemotePluginRepositories() );
                 plugin.setVersion( pluginVersionResolver.resolve( request ).getVersion() );
             }
-            versions.put( plugin.getKey(), plugin.getVersion() );
+            versions.put( baseKey( plugin ), plugin.getVersion() );
         }
 
         PluginManagement pluginManagement = project.getPluginManagement();
@@ -78,6 +82,10 @@ public class LifecyclePluginResolver
         {
             for ( Plugin plugin : pluginManagement.getPlugins() )
             {
+                if ( isAlias( plugin ) )
+                {
+                    continue;
+                }
                 if ( plugin.getVersion() == null )
                 {
                     plugin.setVersion( versions.get( plugin.getKey() ) );
@@ -89,7 +97,37 @@ public class LifecyclePluginResolver
                         plugin.setVersion( pluginVersionResolver.resolve( request ).getVersion() );
                     }
                 }
+                versions.put( baseKey( plugin ), plugin.getVersion() );
             }
         }
+
+        // TODO detect missing versions
+        for ( Plugin plugin : project.getBuildPlugins() )
+        {
+            if ( plugin.getVersion() == null )
+            {
+                plugin.setVersion( versions.get( baseKey( plugin ) ) );
+            }
+        }
+        if ( pluginManagement != null )
+        {
+            for ( Plugin plugin : pluginManagement.getPlugins() )
+            {
+                if ( plugin.getVersion() == null )
+                {
+                    plugin.setVersion( versions.get( baseKey( plugin ) ) );
+                }
+            }
+        }
+    }
+
+    private String baseKey( Plugin plugin )
+    {
+        return plugin.getGroupId() + ":" + plugin.getBaseArtifactId();
+    }
+    
+    private boolean isAlias( Plugin plugin )
+    {
+        return !plugin.getArtifactId().equals( plugin.getBaseArtifactId() );
     }
 }

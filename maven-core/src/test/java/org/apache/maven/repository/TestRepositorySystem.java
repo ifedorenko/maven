@@ -156,7 +156,7 @@ public class TestRepositorySystem
             return null;
         }
 
-        return artifactFactory.createPluginArtifact( plugin.getGroupId(), plugin.getArtifactId(), versionRange );
+        return artifactFactory.createPluginArtifact( plugin.getGroupId(), plugin.getBaseArtifactId(), versionRange );
     }
 
     public Artifact createProjectArtifact( String groupId, String artifactId, String version )

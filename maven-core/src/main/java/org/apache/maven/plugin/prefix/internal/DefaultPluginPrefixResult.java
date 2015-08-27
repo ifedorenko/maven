@@ -47,7 +47,7 @@ class DefaultPluginPrefixResult
     public DefaultPluginPrefixResult( Plugin plugin )
     {
         groupId = plugin.getGroupId();
-        artifactId = plugin.getArtifactId();
+        artifactId = plugin.getBaseArtifactId();
     }
 
     public DefaultPluginPrefixResult( String groupId, String artifactId, ArtifactRepository repository )

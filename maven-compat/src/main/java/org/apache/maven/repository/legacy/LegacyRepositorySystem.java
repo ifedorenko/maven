@@ -208,7 +208,7 @@ public class LegacyRepositorySystem
             return null;
         }
 
-        return artifactFactory.createPluginArtifact( plugin.getGroupId(), plugin.getArtifactId(), versionRange );
+        return artifactFactory.createPluginArtifact( plugin.getGroupId(), plugin.getBaseArtifactId(), versionRange );
     }
 
     public ArtifactRepositoryPolicy buildArtifactRepositoryPolicy( RepositoryPolicy policy )

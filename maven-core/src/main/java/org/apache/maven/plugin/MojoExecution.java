@@ -191,12 +191,12 @@ public class MojoExecution
 
     public String getArtifactId()
     {
-        if ( mojoDescriptor != null )
+        if ( plugin != null )
         {
-            return mojoDescriptor.getPluginDescriptor().getArtifactId();
+            return plugin.getArtifactId();
         }
 
-        return plugin.getArtifactId();
+        return mojoDescriptor.getPluginDescriptor().getArtifactId();
     }
 
     public String getVersion()

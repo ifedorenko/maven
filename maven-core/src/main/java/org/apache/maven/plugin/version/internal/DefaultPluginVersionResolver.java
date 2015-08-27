@@ -371,7 +371,7 @@ public class DefaultPluginVersionResolver
         for ( Plugin plugin : plugins )
         {
             if ( request.getGroupId().equals( plugin.getGroupId() )
-                && request.getArtifactId().equals( plugin.getArtifactId() ) )
+                && request.getArtifactId().equals( plugin.getBaseArtifactId() ) )
             {
                 if ( plugin.getVersion() != null )
                 {

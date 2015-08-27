@@ -167,7 +167,7 @@ public class MavenRepositorySystem
             return null;
         }
 
-        return XcreatePluginArtifact( plugin.getGroupId(), plugin.getArtifactId(), versionRange );
+        return XcreatePluginArtifact( plugin.getGroupId(), plugin.getBaseArtifactId(), versionRange );
     }
 
     public void injectMirror( List<ArtifactRepository> repositories, List<Mirror> mirrors )

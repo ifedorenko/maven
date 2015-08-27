@@ -109,7 +109,7 @@ class CacheUtils
         int hash = 17;
 
         hash = hash * 31 + hash( plugin.getGroupId() );
-        hash = hash * 31 + hash( plugin.getArtifactId() );
+        hash = hash * 31 + hash( plugin.getBaseArtifactId() );
         hash = hash * 31 + hash( plugin.getVersion() );
 
         hash = hash * 31 + ( plugin.isExtensions() ? 1 : 0 );
@@ -135,7 +135,7 @@ class CacheUtils
 
     public static boolean pluginEquals( Plugin a, Plugin b )
     {
-        return eq( a.getArtifactId(), b.getArtifactId() ) //
+        return eq( a.getBaseArtifactId(), b.getBaseArtifactId() ) //
             && eq( a.getGroupId(), b.getGroupId() ) //
             && eq( a.getVersion(), b.getVersion() ) //
             && a.isExtensions() == b.isExtensions() //

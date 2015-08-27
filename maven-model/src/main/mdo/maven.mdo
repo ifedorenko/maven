@@ -2856,6 +2856,22 @@
     {
         return "Plugin [" + getKey() + "]";
     }
+
+    public String getBaseArtifactId()
+    {
+        String artifactId = this.artifactId;
+        if ( artifactId == null )
+        {
+            return null;
+        }
+        int colon = artifactId.indexOf( '#' );
+        // TODO unit test for colon as the first artifactId character
+        if ( colon > 0 )
+        {
+            artifactId = artifactId.substring( 0, colon );
+        }
+        return artifactId;
+    }
             ]]>
           </code>
         </codeSegment>

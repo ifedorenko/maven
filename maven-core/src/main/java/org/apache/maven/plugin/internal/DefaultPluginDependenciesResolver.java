@@ -81,7 +81,7 @@ public class DefaultPluginDependenciesResolver
 
     private Artifact toArtifact( Plugin plugin, RepositorySystemSession session )
     {
-        return new DefaultArtifact( plugin.getGroupId(), plugin.getArtifactId(), null, "jar", plugin.getVersion(),
+        return new DefaultArtifact( plugin.getGroupId(), plugin.getBaseArtifactId(), null, "jar", plugin.getVersion(),
                                     session.getArtifactTypeRegistry().get( "maven-plugin" ) );
     }
 

@@ -36,7 +36,7 @@ public class PluginArtifact
 
     public PluginArtifact( Plugin plugin, Artifact pluginArtifact )
     {
-        super( plugin.getGroupId(), plugin.getArtifactId(), plugin.getVersion(), null, "maven-plugin", null,
+        super( plugin.getGroupId(), plugin.getBaseArtifactId(), plugin.getVersion(), null, "maven-plugin", null,
                new PluginArtifactHandler() );
         this.plugin = plugin;
         setFile( pluginArtifact.getFile() );

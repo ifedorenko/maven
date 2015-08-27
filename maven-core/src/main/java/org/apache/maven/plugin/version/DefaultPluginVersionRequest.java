@@ -66,7 +66,7 @@ public class DefaultPluginVersionRequest
     public DefaultPluginVersionRequest( Plugin plugin, MavenSession session )
     {
         setGroupId( plugin.getGroupId() );
-        setArtifactId( plugin.getArtifactId() );
+        setArtifactId( plugin.getBaseArtifactId() );
 
         setRepositorySession( session.getRepositorySession() );
 
@@ -88,7 +88,7 @@ public class DefaultPluginVersionRequest
                                         List<RemoteRepository> repositories )
     {
         setGroupId( plugin.getGroupId() );
-        setArtifactId( plugin.getArtifactId() );
+        setArtifactId( plugin.getBaseArtifactId() );
 
         setRepositorySession( session );
 

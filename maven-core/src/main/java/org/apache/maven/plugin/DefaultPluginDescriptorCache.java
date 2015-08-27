@@ -143,7 +143,7 @@ public class DefaultPluginDescriptorCache
         public CacheKey( Plugin plugin, List<RemoteRepository> repositories, RepositorySystemSession session )
         {
             groupId = plugin.getGroupId();
-            artifactId = plugin.getArtifactId();
+            artifactId = plugin.getBaseArtifactId();
             version = plugin.getVersion();
 
             workspace = CacheUtils.getWorkspace( session );

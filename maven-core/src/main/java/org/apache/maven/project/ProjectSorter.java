@@ -133,7 +133,7 @@ public class ProjectSorter
                 for ( Plugin plugin : buildPlugins )
                 {
                     addEdge( projectMap, vertexMap, project, projectVertex, plugin.getGroupId(),
-                             plugin.getArtifactId(), plugin.getVersion(), false, true );
+                             plugin.getBaseArtifactId(), plugin.getVersion(), false, true );
 
                     for ( Dependency dependency : plugin.getDependencies() )
                     {

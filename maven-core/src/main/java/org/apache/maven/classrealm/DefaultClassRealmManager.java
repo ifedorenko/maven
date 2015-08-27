@@ -281,7 +281,7 @@ public class DefaultClassRealmManager
     private static String getKey( Plugin plugin, boolean extension )
     {
         String version = ArtifactUtils.toSnapshotVersion( plugin.getVersion() );
-        return ( extension ? "extension>" : "plugin>" ) + plugin.getGroupId() + ":" + plugin.getArtifactId() + ":"
+        return ( extension ? "extension>" : "plugin>" ) + plugin.getGroupId() + ":" + plugin.getBaseArtifactId() + ":"
             + version;
     }
 
