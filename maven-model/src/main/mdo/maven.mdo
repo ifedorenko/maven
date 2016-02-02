@@ -534,6 +534,24 @@
             <multiplicity>*</multiplicity>
           </association>
         </field>
+
+        <!-- ====================================================================== -->
+        <!-- Transient fields                                                       -->
+        <!-- ====================================================================== -->
+
+        <field xml.transient="true">
+          <name>importDependencies</name>
+          <version>4.0.0+</version>
+          <description>
+            <![CDATA[
+            Transient, i.e. in-memory only, list of scope=import dependencies
+            ]]>
+          </description>
+          <association>
+            <type>Dependency</type>
+            <multiplicity>*</multiplicity>
+          </association>
+        </field>
       </fields>
       <codeSegments>
         <codeSegment>

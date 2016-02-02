@@ -1289,6 +1289,8 @@ public class DefaultModelBuilder
             }
 
             importMngts.add( importMngt );
+
+            model.addImportDependency( dependency.clone() );
         }
 
         importIds.remove( importing );
